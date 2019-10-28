@@ -22,6 +22,8 @@ library(here)
 library(janitor)
 ```
 
+## Import data and tidy up
+
 ```{r}
 # Import lobster data (lobster_abundance.csv) from SB long-term ecological survey
 lobster_abundance <- read_csv(here::here("data", "lobster_abundance.csv"),
@@ -42,6 +44,8 @@ lobster_tidy <- lobster_abundance %>%
 (Note: By default, tidyr::uncount() removed the "na" values.)
 
 Now each measure is in its own cell (each lobster has its own row). This is tidy format.
+
+## Exploratory plots and check distributions
 
 Let's look at the data a bunch of different ways, using exploratory plots.
 
@@ -87,4 +91,37 @@ Tests for normality have their issues (tests w/ small samples often miss deviati
 
 For the most part, these data look normally deviated for each group.
 
+## Use 'lubridate' to parse dates and times
+
+Since lubridate-type functions show up in various packages, use *lubridate::* to be specific.
+
+Add a new column with *mutate()* that contains my date as an actual date:
+
+```{r}
+class(lobster_tidy$date) # currently date is just stored by R as a character column
+
+lobster_date <- lobster_tidy %>% 
+  mutate(
+    date_new = lubridate::mdy(date) # our dates are in M/D/Y
+  )
+
+class(lobster_date$date_new)
+```
+
+**Note**: For storing dates in the first place, use ISO format; or better, store year/month/day all in separate columns.
+
+Next, parse the date column to get the different pieces (month, year) separated.
+
+```{r}
+lobster_parse_date <- lobster_date %>% 
+  mutate(
+    obs_yr = lubridate::year(date_new),
+    obs_mo = lubridate::month(date_new, label = TRUE), # label equals TRUE if you want it written out rather than the number
+    obs_da = lubridate::day(date_new)
+  )
+
+levels(lobster_parse_date$obs_mo) # ordering of months is preserved! it's stored as an ordered factor
+```
+
+Count lobsters by different groupings
 
