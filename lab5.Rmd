@@ -62,4 +62,29 @@ ggplot(data = lobster_tidy, aes(x = site, y = size_mm)) +
 # Same thing plotted as a violin plot, since we have a lot of observations.
 ```
 
+```{r}
+# Histogram
+
+ggplot(data = lobster_tidy, aes(x = size_mm)) +
+  geom_histogram(aes(fill = site)) +
+  facet_wrap(~site, scales = "free") # to give each site its own plot
+
+# by default each is given the same scale with facet_wrap(), but can add scales = "free" to give each own scale
+# (of course, don't do that if you're COMPARING ACROSS groups)
+# here we're just interested in the distribution WITHIN each group, to assess normality
+```
+
+```{r}
+# Quantile-Quantile Plot (QQplot)
+# Plots your sample values against the theoretical normal values
+
+ggplot(data = lobster_tidy, aes(sample = size_mm)) + # need to specify which is the sample
+  geom_qq() +
+  facet_wrap(~site, scales = "free")
+```
+
+Tests for normality have their issues (tests w/ small samples often miss deviations from normality, while tests w/ large samples often falsely confirm deviations from normality), but you can look at these plots generally.
+
+For the most part, these data look normally deviated for each group.
+
 
