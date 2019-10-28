@@ -230,3 +230,15 @@ ttest2 <- t.test(size_mm ~ site, data = lobster_compare) # compare size_mm varia
 ttest2
 ```
 
+
+## Create a `geom_tile()` heatmap
+
+Heatmaps are good for displaying three different variables in an aesthetically-pleasing way.
+
+```{r}
+ggplot(data = lobster_yrsite, aes(x = obs_yr, y = site)) + 
+  geom_tile(aes(fill = n))
+
+```
+
+
