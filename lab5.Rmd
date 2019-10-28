@@ -158,3 +158,75 @@ lobster_site <- lobster_parse_date %>%
 lobster_site
 ```
 
+group_by + summarize + n() to put it all in one table:
+
+```{r}
+lobster_summary <- lobster_parse_date %>% 
+  group_by(site) %>% 
+  summarize(
+    mean_size = mean(size_mm, na.rm = TRUE),
+    sd_size = sd(size_mm, na.rm = TRUE),
+    sample_n = n()
+  )
+```
+
+
+## Confidence intervals and t-tests
+
+Use the `t-test()` function to find confidence intervals and perform t-tests
+
+### One-sample t-test
+
+```{r}
+ivee_lobsters <- lobster_tidy %>% 
+  filter(site == "IVEE") %>% # filter is by rows
+  pull(size_mm) # only interested in size_mm column
+
+# Result is just a single vector with each of your size values from IVEE site; but can also call a single column directly
+
+# t-test can calculate confidence interval and perform t-test based on what you give it (1 vector = 1-sample t-test)
+
+t.test(ivee_lobsters) # this is pointless here, but just looking at the confidence interval for the mean
+```
+
+Expect 95% of all other samples to have a mean that falls within the range of ~72.99 to ~74.17.
+
+(This doesn't make any statement about the true population mean! Often misinterpreted that way.)
+
+### Two-sample t-test
+
+Is there a significant difference between mean lobster lengths between Naples Reef and Mohawk Reef?
+
+```{r}
+napl_sample <- lobster_tidy %>% 
+  filter(site == "NAPL") %>% 
+  pull(size_mm)
+
+mohk_sample <- lobster_tidy %>% 
+  filter(site == "MOHK") %>% 
+  pull(size_mm)
+
+mohk_napl_ttest <- t.test(napl_sample, mohk_sample)
+
+mohk_napl_ttest
+```
+
+(Note: Welch's t-test does not assume variances are equal; therefore it's a slightly more conservative version of the t-test.)
+
+?t.test to see the values associated with the t-test function. Then you can pull any part of the output from running the function:
+
+Mean lobster size differed significantly between Mohawk and Naples reefs (t(`r mohk_napl_ttest$parameter`) = `r mohk_napl_ttest$statistic`, p < `r mohk_napl_ttest$p.value`).
+
+The above pulls the values of the t-test directly from the data, using inline referencing, rather than doing copy+paste!
+
+
+### Easier way to do a two-sample t-test
+
+```{r}
+lobster_compare <- lobster_tidy %>% 
+  filter(site %in% c("NAPL", "MOHK"))
+
+ttest2 <- t.test(size_mm ~ site, data = lobster_compare) # compare size_mm variable separated by site (only up to 2!)
+ttest2
+```
+
