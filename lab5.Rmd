@@ -9,3 +9,57 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Objectives:
+
+- Getting counts for different groups
+- Use {lubridate} to parse dates
+- Find confidence intervals & do t-tests with t.test()
+- Heatmap with geom_tile()
+
+```{r, include = FALSE}
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+```{r}
+# Import lobster data (lobster_abundance.csv) from SB long-term ecological survey
+lobster_abundance <- read_csv(here::here("data", "lobster_abundance.csv"),
+                              na = "-99999") %>% 
+  clean_names()
+
+# Data is observed from 5 different sites
+unique(lobster_abundance$site)
+```
+
+Use the tidyr::uncount() function to expand a frequency variable.
+
+```{r}
+lobster_tidy <- lobster_abundance %>% 
+  tidyr::uncount(lobster_count) # now each lobster has its own row
+```
+
+(Note: By default, tidyr::uncount() removed the "na" values.)
+
+Now each measure is in its own cell (each lobster has its own row). This is tidy format.
+
+Let's look at the data a bunch of different ways, using exploratory plots.
+
+```{r}
+# Jitterplot
+ggplot(data = lobster_tidy, aes(x = site, y = size_mm)) +
+  geom_jitter(aes(color = site),
+              width = 0.2)
+
+# Few too many points to be useful...
+```
+
+```{r}
+# Violin plot
+ggplot(data = lobster_tidy, aes(x = site, y = size_mm)) +
+  geom_violin(aes(color = site))
+
+# Same thing plotted as a violin plot, since we have a lot of observations.
+```
+
+
