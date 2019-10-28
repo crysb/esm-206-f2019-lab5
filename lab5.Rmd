@@ -22,6 +22,7 @@ library(here)
 library(janitor)
 ```
 
+
 ## Import data and tidy up
 
 ```{r}
@@ -44,6 +45,7 @@ lobster_tidy <- lobster_abundance %>%
 (Note: By default, tidyr::uncount() removed the "na" values.)
 
 Now each measure is in its own cell (each lobster has its own row). This is tidy format.
+
 
 ## Exploratory plots and check distributions
 
@@ -91,6 +93,7 @@ Tests for normality have their issues (tests w/ small samples often miss deviati
 
 For the most part, these data look normally deviated for each group.
 
+
 ## Use 'lubridate' to parse dates and times
 
 Since lubridate-type functions show up in various packages, use *lubridate::* to be specific.
@@ -123,5 +126,35 @@ lobster_parse_date <- lobster_date %>%
 levels(lobster_parse_date$obs_mo) # ordering of months is preserved! it's stored as an ordered factor
 ```
 
-Count lobsters by different groupings
+
+## Count lobsters by different groupings, using *dplyr::count()*
+
+*?count* to see what it does: groups, tallies, then ungroups
+
+Let's say I want to count the number of lobsters by year and month:
+
+```{r}
+lobster_yrmo <- lobster_parse_date %>% 
+  count(obs_yr, obs_mo)
+
+lobster_yrmo
+```
+
+Or by observation year, then by site:
+
+```{r}
+lobster_yrsite <- lobster_parse_date %>% 
+  count(obs_yr, site)
+
+lobster_yrsite
+```
+
+Or just by site:
+
+```{r}
+lobster_site <- lobster_parse_date %>% 
+  count(site)
+
+lobster_site
+```
 
